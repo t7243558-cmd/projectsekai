@@ -1,0 +1,6 @@
+{
+  "name": "SchoolHub - Communication & Notification Hub",
+  "description": "แพลตฟอร์มศูนย์กลางการสื่อสารโรงเรียน ระบบแจ้งเตือนอัจฉริยะ คัดกรองตามกลุ่มเป้าหมาย ตรวจสอบการอ่าน และซิงก์ปฏิทินผู้ปกครอง",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
