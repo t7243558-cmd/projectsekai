@@ -76,6 +76,7 @@ export interface Announcement {
   targets: TargetFilter;
   targetCountEstimate: number;
   eventDetails?: EventSchedule;
+  images?: string[];
   attachments?: {
     id: string;
     name: string;

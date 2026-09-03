@@ -106,6 +106,9 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
     },
     targetCountEstimate: 1140,
     requiresAcknowledgment: true,
+    images: [
+      'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1000&q=80',
+    ],
     createdAt: '2026-09-02T07:15:00Z',
     publishedAt: '2026-09-02T07:15:00Z',
     isPinned: true,
@@ -137,6 +140,9 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
       requiresRsvp: true,
     },
     requiresAcknowledgment: true,
+    images: [
+      'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80',
+    ],
     createdAt: '2026-09-01T10:00:00Z',
     publishedAt: '2026-09-01T10:00:00Z',
   },
@@ -166,6 +172,10 @@ export const INITIAL_ANNOUNCEMENTS: Announcement[] = [
       isAllDay: false,
     },
     requiresAcknowledgment: false,
+    images: [
+      'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1000&q=80',
+    ],
     createdAt: '2026-08-30T14:20:00Z',
     publishedAt: '2026-08-30T14:20:00Z',
   },
@@ -304,3 +314,50 @@ export const MOCK_READ_RECEIPTS_M1_2: ReadReceipt[] = [
     deliveryStatus: 'DELIVERED',
   },
 ];
+
+export interface PresetImage {
+  id: string;
+  title: string;
+  category: string;
+  url: string;
+}
+
+export const PRESET_SCHOOL_IMAGES: PresetImage[] = [
+  {
+    id: 'img_meeting',
+    title: 'ห้องประชุม/สัมมนา',
+    category: 'นัดหมาย',
+    url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'img_pm25',
+    title: 'ประกาศมลพิษ PM 2.5',
+    category: 'วิกฤต/ฉุกเฉิน',
+    url: 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'img_activities',
+    title: 'กิจกรรมดนตรี/วงโยธวาทิต',
+    category: 'กิจกรรม',
+    url: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'img_stem',
+    title: 'ห้องทดลองวิทยาศาสตร์/หุ่นยนต์',
+    category: 'วิชาการ',
+    url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'img_sports',
+    title: 'สนามกีฬาและการแข่งขัน',
+    category: 'กีฬา',
+    url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'img_bus',
+    title: 'รถรับส่งและเส้นทางเดินรถ',
+    category: 'การเดินทาง',
+    url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1000&q=80',
+  },
+];
+

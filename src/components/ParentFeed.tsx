@@ -14,7 +14,11 @@ import {
   Sparkles,
   ExternalLink,
   ShieldCheck,
-  User
+  User,
+  Image as ImageIcon,
+  ZoomIn,
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import { Announcement, UserProfile, ReadReceipt } from '../types';
 import { generateGoogleCalendarUrl, downloadIcsFile } from '../utils/calendar';
@@ -39,6 +43,33 @@ export const ParentFeed: React.FC<ParentFeedProps> = ({
   const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'CRITICAL' | 'APPOINTMENT' | 'UNREAD'>('ALL');
   const [expandedAnnId, setExpandedAnnId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Lightbox Image Viewer State
+  const [lightbox, setLightbox] = useState<{
+    images: string[];
+    currentIndex: number;
+    title: string;
+  } | null>(null);
+
+  const openLightbox = (images: string[], index: number, title: string) => {
+    setLightbox({ images, currentIndex: index, title });
+  };
+
+  const nextLightboxImage = () => {
+    if (!lightbox) return;
+    setLightbox(prev => prev ? {
+      ...prev,
+      currentIndex: (prev.currentIndex + 1) % prev.images.length
+    } : null);
+  };
+
+  const prevLightboxImage = () => {
+    if (!lightbox) return;
+    setLightbox(prev => prev ? {
+      ...prev,
+      currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length
+    } : null);
+  };
 
   const child = currentUser.children?.[0];
 
@@ -243,6 +274,13 @@ export const ParentFeed: React.FC<ParentFeedProps> = ({
                       <span className="text-xs text-slate-500">
                         {ann.author.name} • {new Date(ann.publishedAt).toLocaleDateString('th-TH')}
                       </span>
+
+                      {ann.images && ann.images.length > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                          <ImageIcon className="w-3 h-3 text-indigo-500" />
+                          <span>{ann.images.length} รูปภาพ</span>
+                        </span>
+                      )}
                     </div>
 
                     {/* Read Status Badge */}
@@ -322,6 +360,106 @@ export const ParentFeed: React.FC<ParentFeedProps> = ({
                     </div>
                   )}
 
+                  {/* Accompanying Photos Gallery */}
+                  {ann.images && ann.images.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <span className="flex items-center gap-1.5 font-medium text-slate-700">
+                          <ImageIcon className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>ภาพประกอบประกาศ ({ann.images.length} รูป)</span>
+                        </span>
+                        <span className="text-[11px] text-slate-400">คลิกที่ภาพเพื่อขยายดูขนาดเต็ม</span>
+                      </div>
+
+                      {ann.images.length === 1 ? (
+                        <div 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openLightbox(ann.images!, 0, ann.title);
+                          }}
+                          className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 cursor-zoom-in max-h-72"
+                        >
+                          <img
+                            src={ann.images[0]}
+                            alt={ann.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-auto max-h-72 object-cover group-hover:scale-102 transition-transform duration-200"
+                          />
+                          <div className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-xs text-white text-xs px-2.5 py-1 rounded-lg flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                            <ZoomIn className="w-3.5 h-3.5" />
+                            <span>แตะเพื่อขยาย</span>
+                          </div>
+                        </div>
+                      ) : ann.images.length === 2 ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {ann.images.map((imgUrl, idx) => (
+                            <div
+                              key={idx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openLightbox(ann.images!, idx, ann.title);
+                              }}
+                              className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-video cursor-zoom-in"
+                            >
+                              <img
+                                src={imgUrl}
+                                alt={`${ann.title} - รูปที่ ${idx + 1}`}
+                                referrerPolicy="no-referrer"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              />
+                              <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="bg-black/70 text-white text-xs px-2.5 py-1 rounded-lg flex items-center gap-1">
+                                  <ZoomIn className="w-3.5 h-3.5" />
+                                  <span>ขยาย</span>
+                                </span>
+                              </div>
+                              <span className="absolute bottom-1.5 left-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                {idx + 1}/{ann.images!.length}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-3 gap-2">
+                          {ann.images.slice(0, 3).map((imgUrl, idx) => {
+                            const isLastAndMore = idx === 2 && ann.images!.length > 3;
+                            const remainingCount = ann.images!.length - 3;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openLightbox(ann.images!, idx, ann.title);
+                                }}
+                                className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-video cursor-zoom-in"
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`${ann.title} - รูปที่ ${idx + 1}`}
+                                  referrerPolicy="no-referrer"
+                                  className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${isLastAndMore ? 'brightness-40' : ''}`}
+                                />
+                                {isLastAndMore ? (
+                                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white font-bold text-xs sm:text-sm">
+                                    <span>+{remainingCount} รูป</span>
+                                    <span className="text-[10px] font-normal opacity-90">ดูทั้งหมด</span>
+                                  </div>
+                                ) : (
+                                  <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <ZoomIn className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
+                                <span className="absolute bottom-1 left-1.5 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                  {idx + 1}/{ann.images!.length}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Expandable full content */}
                   {isExpanded && (
                     <div className="pt-3 border-t border-slate-100 text-sm text-slate-700 space-y-2 whitespace-pre-line leading-relaxed bg-slate-50/50 p-3 rounded-xl">
@@ -369,6 +507,77 @@ export const ParentFeed: React.FC<ParentFeedProps> = ({
           })
         )}
       </div>
+
+      {/* Lightbox Modal */}
+      {lightbox && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xs flex flex-col items-center justify-between p-4"
+          onClick={() => setLightbox(null)}
+        >
+          {/* Lightbox Top Header */}
+          <div 
+            className="w-full max-w-4xl flex items-center justify-between text-white py-2 px-1 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 truncate pr-2">
+              <span className="text-xs bg-white/20 px-2.5 py-1 rounded-full font-semibold shrink-0">
+                รูปที่ {lightbox.currentIndex + 1} จาก {lightbox.images.length}
+              </span>
+              <span className="text-xs text-slate-300 truncate">
+                {lightbox.title}
+              </span>
+            </div>
+            <button
+              onClick={() => setLightbox(null)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors cursor-pointer shrink-0"
+              title="ปิดหน้าต่างรูปภาพ"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Lightbox Main Image & Navigation */}
+          <div 
+            className="relative flex-1 w-full max-w-4xl flex items-center justify-center my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {lightbox.images.length > 1 && (
+              <button
+                onClick={prevLightboxImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center z-10 transition-transform hover:scale-110 cursor-pointer shadow-lg"
+                title="รูปก่อนหน้า"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            <img
+              src={lightbox.images[lightbox.currentIndex]}
+              alt={`ขยายรูปภาพที่ ${lightbox.currentIndex + 1}`}
+              referrerPolicy="no-referrer"
+              className="max-h-[75vh] max-w-full object-contain rounded-xl shadow-2xl transition-all"
+            />
+
+            {lightbox.images.length > 1 && (
+              <button
+                onClick={nextLightboxImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center z-10 transition-transform hover:scale-110 cursor-pointer shadow-lg"
+                title="รูปถัดไป"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          {/* Lightbox Footer */}
+          <div 
+            className="w-full max-w-4xl flex items-center justify-center gap-2 py-2 text-xs text-slate-400"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span>แตะพื้นที่ว่างเพื่อปิด หรือใช้ปุ่มลูกศรเพื่อดูภาพถัดไป</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
